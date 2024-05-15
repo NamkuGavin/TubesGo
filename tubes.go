@@ -299,24 +299,70 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 }
 
 func editData(data *pesertaSeagames, n int) {
-	var pilihEdit string
-	fmt.Println("-------------------------")
-	fmt.Println("Pilih:")
-	fmt.Println("1. Edit nama peserta Negara")
-	fmt.Println("2. Edit data Medali peserta")
-	fmt.Println("3. <- kembali")
-	fmt.Println("-------------------------")
-	fmt.Print("Pilih (1/2/3): ")
-	fmt.Scan(&pilihEdit)
+	if n != 0 {
+		var pilihEdit string
+		fmt.Println("-------------------------")
+		fmt.Println("Pilih:")
+		fmt.Println("1. Edit nama peserta Negara")
+		fmt.Println("2. Edit data Medali peserta")
+		fmt.Println("3. <- kembali")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (1/2/3): ")
+		fmt.Scan(&pilihEdit)
 
-	if pilihEdit == "1" {
-		fmt.Print()
-	} else if pilihEdit == "2" {
-		fmt.Print()
-	} else if pilihEdit == "3" {
-		kustomisasiData(data, &n)
+		if pilihEdit == "1" {
+			editNegara(data, n)
+		} else if pilihEdit == "2" {
+			fmt.Print()
+		} else if pilihEdit == "3" {
+			kustomisasiData(data, &n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			editData(data, n)
+		}
 	} else {
-		fmt.Println("Silahkan input pilihan yang benar.")
+		fmt.Println("Data peserta Seagames kosong. Pengeditan tidak dapat dilakukan.")
+		kustomisasiData(data, &n)
+	}
+}
+
+func editNegara(data *pesertaSeagames, n int) {
+	var cariApa, negaraBaru string
+	var ketemu, dataDuplicate bool
+	var indexDi int
+	var titip pesertaSeagames
+	for i := 0; i < n; i++ {
+		titip[i] = data[i]
+	}
+	fmt.Print("Ingin mengedit nama Negara apa: ")
+	fmt.Scan(&cariApa)
+	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
+	if ketemu {
+		fmt.Print("Nama Negara ditemukan. Ubah menjadi: ")
+		fmt.Scan(&negaraBaru)
+		data[indexDi].negara = negaraBaru
+		dataDuplicate = searchDuplicate(*data, *data, n)
+		if dataDuplicate {
+			for i := 0; i < n; i++ {
+				data[i].negara = titip[i].negara
+			}
+			fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
+			editNegara(data, n)
+		} else {
+			fmt.Println("Pengeditan selesai.")
+			editData(data, n)
+		}
+	} else {
+		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
 		editData(data, n)
+	}
+}
+
+func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, indexDi *int) {
+	for i := 0; i < n; i++ {
+		if cari == data[i].negara {
+			*ketemu = true
+			*indexDi = i
+		}
 	}
 }
