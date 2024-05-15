@@ -74,6 +74,34 @@ func kustomisasiData(data *pesertaSeagames, n *int) {
 	}
 }
 
+func editData(data *pesertaSeagames, n int) {
+	if n != 0 {
+		var pilihEdit string
+		fmt.Println("-------------------------")
+		fmt.Println("Pilih:")
+		fmt.Println("1. Edit nama peserta Negara")
+		fmt.Println("2. Edit data Medali peserta")
+		fmt.Println("3. <- kembali")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (1/2/3): ")
+		fmt.Scan(&pilihEdit)
+
+		if pilihEdit == "1" {
+			editNegara(data, n)
+		} else if pilihEdit == "2" {
+			editMedali(data, n)
+		} else if pilihEdit == "3" {
+			kustomisasiData(data, &n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			editData(data, n)
+		}
+	} else {
+		fmt.Println("Data peserta Seagames kosong. Pengeditan tidak dapat dilakukan.")
+		kustomisasiData(data, &n)
+	}
+}
+
 func cetakData(data pesertaSeagames, n int) {
 	var maxGold, maxSilver, maxBronze bool
 	var maxG, maxS, maxB string
@@ -100,6 +128,8 @@ func cetakData(data pesertaSeagames, n int) {
 
 		fmt.Printf("Negara dengan perolehan Silver terbanyak: %s\n", maxS)
 		fmt.Printf("Negara dengan perolehan Bronze terbanyak: %s\n", maxB)
+		fmt.Println()
+		fmt.Println()
 		mainMenu(data, n)
 	} else {
 		fmt.Println("Belum ada data peserta Seagames yang dimasukkan. Silahkan lakukan input data.")
@@ -252,7 +282,7 @@ func searchFindMax(data pesertaSeagames, maxGold, maxSilver, maxBronze *bool, n 
 			*maxSilver = false
 			*maxBronze = true
 		}
-		if max == data[i].bronze || max == data[i].silver {
+		if max <= data[i].gold {
 			*maxGold = true
 			*maxSilver = false
 			*maxBronze = false
@@ -298,34 +328,6 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 	return cek >= 2
 }
 
-func editData(data *pesertaSeagames, n int) {
-	if n != 0 {
-		var pilihEdit string
-		fmt.Println("-------------------------")
-		fmt.Println("Pilih:")
-		fmt.Println("1. Edit nama peserta Negara")
-		fmt.Println("2. Edit data Medali peserta")
-		fmt.Println("3. <- kembali")
-		fmt.Println("-------------------------")
-		fmt.Print("Pilih (1/2/3): ")
-		fmt.Scan(&pilihEdit)
-
-		if pilihEdit == "1" {
-			editNegara(data, n)
-		} else if pilihEdit == "2" {
-			fmt.Print()
-		} else if pilihEdit == "3" {
-			kustomisasiData(data, &n)
-		} else {
-			fmt.Println("Silahkan input pilihan yang benar.")
-			editData(data, n)
-		}
-	} else {
-		fmt.Println("Data peserta Seagames kosong. Pengeditan tidak dapat dilakukan.")
-		kustomisasiData(data, &n)
-	}
-}
-
 func editNegara(data *pesertaSeagames, n int) {
 	var cariApa, negaraBaru string
 	var ketemu, dataDuplicate bool
@@ -364,5 +366,33 @@ func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, ind
 			*ketemu = true
 			*indexDi = i
 		}
+	}
+}
+
+func editMedali(data *pesertaSeagames, n int) {
+	var cariApa string
+	var ketemu bool
+	var indexDi, gold, silver, bronze int
+	fmt.Print("Ingin mengedit medali dari Negara apa: ")
+	fmt.Scan(&cariApa)
+	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
+	if ketemu {
+		fmt.Println("Silahkan masukkan data Medali nya!")
+		fmt.Printf("%-4s %-6s %-6s\n", "Gold", "Silver", "Bronze")
+		fmt.Scan(&gold, &silver, &bronze)
+		if gold != -1 {
+			data[indexDi].gold = gold
+		}
+		if silver != -1 {
+			data[indexDi].silver = silver
+		}
+		if bronze != -1 {
+			data[indexDi].bronze = bronze
+		}
+		fmt.Println("Pengeditan Selesai")
+		editData(data, n)
+	} else {
+		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		editMedali(data, n)
 	}
 }
