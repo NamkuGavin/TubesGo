@@ -40,7 +40,7 @@ func mainMenu(data pesertaSeagames, n int) {
 	} else if pilihMainMenu == "3" {
 		fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini")
 	} else {
-		fmt.Println("Silahkan input angka yang benar.")
+		fmt.Println("Silahkan pilihan angka yang benar.")
 		mainMenu(data, n)
 	}
 }
@@ -63,13 +63,13 @@ func kustomisasiData(data *pesertaSeagames, n *int) {
 	if pilihCustom == "1" {
 		addData(data, n)
 	} else if pilihCustom == "2" {
-		fmt.Println("edit")
+		editData(data, *n)
 	} else if pilihCustom == "3" {
 		fmt.Println("delete")
 	} else if pilihCustom == "4" {
 		mainMenu(*data, *n)
 	} else {
-		fmt.Println("Silahkan input angka yang benar.")
+		fmt.Println("Silahkan input pilihan yang benar.")
 		kustomisasiData(data, n)
 	}
 }
@@ -296,4 +296,27 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 		}
 	}
 	return cek >= 2
+}
+
+func editData(data *pesertaSeagames, n int) {
+	var pilihEdit string
+	fmt.Println("-------------------------")
+	fmt.Println("Pilih:")
+	fmt.Println("1. Edit nama peserta Negara")
+	fmt.Println("2. Edit data Medali peserta")
+	fmt.Println("3. <- kembali")
+	fmt.Println("-------------------------")
+	fmt.Print("Pilih (1/2/3): ")
+	fmt.Scan(&pilihEdit)
+
+	if pilihEdit == "1" {
+		fmt.Print()
+	} else if pilihEdit == "2" {
+		fmt.Print()
+	} else if pilihEdit == "3" {
+		kustomisasiData(data, &n)
+	} else {
+		fmt.Println("Silahkan input pilihan yang benar.")
+		editData(data, n)
+	}
 }
