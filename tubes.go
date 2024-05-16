@@ -38,9 +38,9 @@ func mainMenu(data pesertaSeagames, n int) {
 	} else if pilihMainMenu == "2" {
 		cetakData(data, n)
 	} else if pilihMainMenu == "3" {
-		fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini")
+		fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini.")
 	} else {
-		fmt.Println("Silahkan pilihan angka yang benar.")
+		fmt.Println("Silahkan input pilihan yang benar.")
 		mainMenu(data, n)
 	}
 }
@@ -77,6 +77,7 @@ func kustomisasiData(data *pesertaSeagames, n *int) {
 func editData(data *pesertaSeagames, n int) {
 	if n != 0 {
 		var pilihEdit string
+		fmt.Println()
 		fmt.Println("-------------------------")
 		fmt.Println("Pilih:")
 		fmt.Println("1. Edit nama peserta Negara")
@@ -141,68 +142,88 @@ func addData(data *pesertaSeagames, n *int) {
 	var dataKosong arrayKosong
 	var adaKah, dataDuplicate bool
 	var tambah int
-	var negara string
+	var negara, pilih string
 	var gold, silver, bronze int
 	adaKah = checkingData(*n)
 	if adaKah {
-		fmt.Println("Terdapat data yang sudah tersimpan. Silahkan masukkan data peserta tambahan!")
-		fmt.Print("Ingin menambahkan berapa data: ")
-		fmt.Scan(&tambah)
-		if *n+tambah > nmax {
-			fmt.Println("Mohon maaf. Data tidak bisa lebih dari 200. Silahkan input lagi.")
-			addData(data, n)
-		} else {
-			fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
-			fmt.Printf("%-10s %-4s %-6s %-6s\n", "Negara", "Gold", "Silver", "Bronze")
-			for i := *n; i < *n+tambah; i++ {
-				fmt.Scan(&negara, &gold, &silver, &bronze)
-				data[i].negara = negara
-				data[i].gold = gold
-				data[i].silver = silver
-				data[i].bronze = bronze
-			}
-			dataDuplicate = searchDuplicate(*data, *data, *n+tambah)
-			if dataDuplicate {
-				for i := *n; i < *n+tambah; i++ {
-					data[i] = dataKosong[i]
-				}
-				fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
-				kustomisasiData(data, n)
+		fmt.Print("Terdapat data yang sudah tersimpan. Apakah anda ingin menambahkan data (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			fmt.Println("Silahkan masukkan data peserta tambahan!")
+			fmt.Print("Ingin menambahkan berapa data: ")
+			fmt.Scan(&tambah)
+			if *n+tambah > nmax {
+				fmt.Println("Mohon maaf. Data tidak bisa lebih dari 200. Silahkan input lagi.")
+				addData(data, n)
 			} else {
-				*n += tambah
-				fmt.Println("Pemasukan data selesai!")
-				kustomisasiData(data, n)
+				fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
+				fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
+				for i := *n; i < *n+tambah; i++ {
+					fmt.Printf("%d. ", i+1)
+					fmt.Scan(&negara, &gold, &silver, &bronze)
+					data[i].negara = negara
+					data[i].gold = gold
+					data[i].silver = silver
+					data[i].bronze = bronze
+				}
+				dataDuplicate = searchDuplicate(*data, *data, *n+tambah)
+				if dataDuplicate {
+					for i := *n; i < *n+tambah; i++ {
+						data[i] = dataKosong[i]
+					}
+					fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
+					kustomisasiData(data, n)
+				} else {
+					*n += tambah
+					fmt.Println("Pemasukan data selesai!")
+					kustomisasiData(data, n)
+				}
 			}
+		} else if pilih == "N" || pilih == "n" {
+			kustomisasiData(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			addData(data, n)
 		}
 	} else {
-		fmt.Print("Ingin memasukkan berapa data: ")
-		fmt.Scan(&*n)
-		if *n > nmax {
-			fmt.Println("Mohon maaf. Data tidak bisa lebih dari 200. Silahkan input lagi.")
-			*n = 0
-			addData(data, n)
-		} else {
-			fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
-			fmt.Printf("%-10s %-4s %-6s %-6s\n", "Negara", "Emas", "Silver", "Bronze")
-			for i := 0; i < *n; i++ {
-				fmt.Scan(&negara, &gold, &silver, &bronze)
-				data[i].negara = negara
-				data[i].gold = gold
-				data[i].silver = silver
-				data[i].bronze = bronze
-			}
-			dataDuplicate = searchDuplicate(*data, *data, *n)
-			if dataDuplicate {
-				for i := 0; i < *n; i++ {
-					data[i] = dataKosong[i]
-				}
+		fmt.Print("Belum ada data yang tersimpan. Apakah anda ingin menambahkan data (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			fmt.Print("Ingin memasukkan berapa data: ")
+			fmt.Scan(&*n)
+			if *n > nmax {
+				fmt.Println("Mohon maaf. Data tidak bisa menampung lebih dari 200. Silahkan input lagi.")
 				*n = 0
-				fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
-				kustomisasiData(data, n)
+				addData(data, n)
 			} else {
-				fmt.Println("Pemasukan data selesai!")
-				kustomisasiData(data, n)
+				fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
+				fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
+				for i := 0; i < *n; i++ {
+					fmt.Printf("%d. ", i+1)
+					fmt.Scan(&negara, &gold, &silver, &bronze)
+					data[i].negara = negara
+					data[i].gold = gold
+					data[i].silver = silver
+					data[i].bronze = bronze
+				}
+				dataDuplicate = searchDuplicate(*data, *data, *n)
+				if dataDuplicate {
+					for i := 0; i < *n; i++ {
+						data[i] = dataKosong[i]
+					}
+					*n = 0
+					fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
+					kustomisasiData(data, n)
+				} else {
+					fmt.Println("Pemasukan data selesai!")
+					kustomisasiData(data, n)
+				}
 			}
+		} else if pilih == "N" || pilih == "n" {
+			kustomisasiData(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			addData(data, n)
 		}
 	}
 }
@@ -340,7 +361,7 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 }
 
 func editNegara(data *pesertaSeagames, n int) {
-	var cariApa, negaraBaru string
+	var cariApa, negaraBaru, pilih string
 	var ketemu, dataDuplicate bool
 	var indexDi int
 	var titip pesertaSeagames
@@ -353,16 +374,25 @@ func editNegara(data *pesertaSeagames, n int) {
 	if ketemu {
 		fmt.Print("Nama Negara ditemukan. Ubah menjadi: ")
 		fmt.Scan(&negaraBaru)
-		data[indexDi].negara = negaraBaru
-		dataDuplicate = searchDuplicate(*data, *data, n)
-		if dataDuplicate {
-			for i := 0; i < n; i++ {
-				data[i].negara = titip[i].negara
+		fmt.Print("Apakah anda ingin mengedit ini (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			data[indexDi].negara = negaraBaru
+			dataDuplicate = searchDuplicate(*data, *data, n)
+			if dataDuplicate {
+				for i := 0; i < n; i++ {
+					data[i].negara = titip[i].negara
+				}
+				fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
+				editNegara(data, n)
+			} else {
+				fmt.Println("Pengeditan selesai.")
+				editData(data, n)
 			}
-			fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
-			editNegara(data, n)
+		} else if pilih == "N" || pilih == "n" {
+			editData(data, n)
 		} else {
-			fmt.Println("Pengeditan selesai.")
+			fmt.Println("Silahkan input pilihan yang benar.")
 			editData(data, n)
 		}
 	} else {
@@ -381,27 +411,36 @@ func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, ind
 }
 
 func editMedali(data *pesertaSeagames, n int) {
-	var cariApa string
+	var cariApa, pilih string
 	var ketemu bool
 	var indexDi, gold, silver, bronze int
 	fmt.Print("Ingin mengedit medali dari Negara apa: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
-		fmt.Println("Silahkan masukkan data Medali nya!")
-		fmt.Printf("%-4s %-6s %-6s\n", "Gold", "Silver", "Bronze")
+		fmt.Println("Silahkan masukkan data Medali nya. Masukkan -1 jika tidak ingin mengedit medali tertentu")
+		fmt.Println("dengan format: <Gold> <Silver> <Bronze>")
 		fmt.Scan(&gold, &silver, &bronze)
-		if gold != -1 {
-			data[indexDi].gold = gold
+		fmt.Print("Apakah anda ingin mengedit ini (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			if gold != -1 {
+				data[indexDi].gold = gold
+			}
+			if silver != -1 {
+				data[indexDi].silver = silver
+			}
+			if bronze != -1 {
+				data[indexDi].bronze = bronze
+			}
+			fmt.Println("Pengeditan Selesai")
+			editData(data, n)
+		} else if pilih == "N" || pilih == "n" {
+			editData(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			editMedali(data, n)
 		}
-		if silver != -1 {
-			data[indexDi].silver = silver
-		}
-		if bronze != -1 {
-			data[indexDi].bronze = bronze
-		}
-		fmt.Println("Pengeditan Selesai")
-		editData(data, n)
 	} else {
 		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
 		editMedali(data, n)
@@ -437,7 +476,7 @@ func deleteData(data *pesertaSeagames, n int) {
 }
 
 func deleteMedali(data *pesertaSeagames, n int) {
-	var cariApa, medaliApa string
+	var cariApa, medaliApa, pilih string
 	var ketemu bool
 	var indexDi int
 	fmt.Print("Ingin menghapus medali dari Negara: ")
@@ -455,23 +494,59 @@ func deleteMedali(data *pesertaSeagames, n int) {
 		fmt.Scan(&medaliApa)
 
 		if medaliApa == "1" {
-			data[indexDi].gold = 0
-			fmt.Println("Penghapusan berhasil.")
-			deleteData(data, n)
+			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)? ")
+			fmt.Scan(&pilih)
+			if pilih == "Y" || pilih == "y" {
+				data[indexDi].gold = 0
+				fmt.Println("Penghapusan berhasil.")
+				deleteData(data, n)
+			} else if pilih == "N" || pilih == "n" {
+				deleteData(data, n)
+			} else {
+				fmt.Println("Silahkan input pilihan yang benar.")
+				deleteMedali(data, n)
+			}
 		} else if medaliApa == "2" {
-			data[indexDi].silver = 0
-			fmt.Println("Penghapusan berhasil.")
-			deleteData(data, n)
+			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
+			fmt.Scan(&pilih)
+			if pilih == "Y" || pilih == "y" {
+				data[indexDi].silver = 0
+				fmt.Println("Penghapusan berhasil.")
+				deleteData(data, n)
+			} else if pilih == "N" || pilih == "n" {
+				deleteData(data, n)
+			} else {
+				fmt.Println("Silahkan input pilihan yang benar.")
+				deleteMedali(data, n)
+			}
 		} else if medaliApa == "3" {
-			data[indexDi].bronze = 0
-			fmt.Println("Penghapusan berhasil.")
-			deleteData(data, n)
+			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
+			fmt.Scan(&pilih)
+			if pilih == "Y" || pilih == "y" {
+				data[indexDi].bronze = 0
+				fmt.Println("Penghapusan berhasil.")
+				deleteData(data, n)
+			} else if pilih == "N" || pilih == "n" {
+				deleteData(data, n)
+			} else {
+				fmt.Println("Silahkan input pilihan yang benar.")
+				deleteMedali(data, n)
+			}
 		} else if medaliApa == "4" {
-			data[indexDi].gold = 0
-			data[indexDi].silver = 0
-			data[indexDi].bronze = 0
-			fmt.Println("Penghapusan berhasil.")
-			deleteData(data, n)
+			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
+			fmt.Scan(&pilih)
+			if pilih == "Y" || pilih == "y" {
+				data[indexDi].gold = 0
+				data[indexDi].silver = 0
+				data[indexDi].bronze = 0
+				fmt.Println("Penghapusan berhasil.")
+				deleteData(data, n)
+			} else if pilih == "N" || pilih == "n" {
+				deleteData(data, n)
+			} else {
+				fmt.Println("Silahkan input pilihan yang benar.")
+				deleteMedali(data, n)
+			}
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
 			deleteMedali(data, n)
@@ -483,19 +558,28 @@ func deleteMedali(data *pesertaSeagames, n int) {
 }
 
 func deleteNegara(data *pesertaSeagames, n int) {
-	var cariApa string
+	var cariApa, pilih string
 	var ketemu bool
 	var indexDi int
 	fmt.Print("Ingin menghapus data Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
-		for i := 0; i < n; i++ {
-			data[i] = data[i+1]
+		fmt.Print("Apakah anda ingin menghapus data ini (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			for i := 0; i < n; i++ {
+				data[i] = data[i+1]
+			}
+			n -= 1
+			fmt.Println("Penghapusan berhasil.")
+			deleteData(data, n)
+		} else if pilih == "N" || pilih == "n" {
+			deleteData(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			deleteNegara(data, n)
 		}
-		n -= 1
-		fmt.Println("Penghapusan berhasil.")
-		deleteData(data, n)
 	} else {
 		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
 		deleteNegara(data, n)
