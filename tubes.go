@@ -65,7 +65,7 @@ func kustomisasiData(data *pesertaSeagames, n *int) {
 	} else if pilihCustom == "2" {
 		editData(data, *n)
 	} else if pilihCustom == "3" {
-		fmt.Println("delete")
+		deleteData(data, *n)
 	} else if pilihCustom == "4" {
 		mainMenu(*data, *n)
 	} else {
@@ -261,31 +261,42 @@ func sortingBronzeDesc(data *pesertaSeagames, n int) {
 }
 
 func searchFindMax(data pesertaSeagames, maxGold, maxSilver, maxBronze *bool, n int) {
-	var max int
-	max = data[0].gold
+	var max, cek int
+	*maxGold = true
+	*maxSilver = false
+	*maxBronze = false
 	for i := 0; i < n; i++ {
-		if data[i].gold >= max {
-			max = data[i].gold
-			*maxGold = true
-			*maxSilver = false
-			*maxBronze = false
+		if *maxGold {
+			cek = 0
+			if data[i].gold > max {
+				max = data[i].gold
+			}
+			for j := 0; j < n; j++ {
+				if max == data[j].gold {
+					cek++
+				}
+			}
+			if cek >= 2 {
+				*maxGold = false
+				*maxSilver = true
+				*maxBronze = false
+			}
 		}
-		if data[i].silver >= max {
-			max = data[i].silver
-			*maxGold = false
-			*maxSilver = true
-			*maxBronze = false
-		}
-		if data[i].bronze >= max {
-			max = data[i].bronze
-			*maxGold = false
-			*maxSilver = false
-			*maxBronze = true
-		}
-		if max <= data[i].gold {
-			*maxGold = true
-			*maxSilver = false
-			*maxBronze = false
+		if *maxSilver {
+			cek = 0
+			if data[i].silver > max {
+				max = data[i].silver
+			}
+			for j := 0; j < n; j++ {
+				if max == data[j].silver {
+					cek++
+				}
+			}
+			if cek >= 2 {
+				*maxGold = false
+				*maxSilver = false
+				*maxBronze = true
+			}
 		}
 	}
 }
@@ -394,5 +405,99 @@ func editMedali(data *pesertaSeagames, n int) {
 	} else {
 		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
 		editMedali(data, n)
+	}
+}
+
+func deleteData(data *pesertaSeagames, n int) {
+	if n != 0 {
+		var pilihEdit string
+		fmt.Println("-------------------------")
+		fmt.Println("Pilih:")
+		fmt.Println("1. Delete nama peserta Negara")
+		fmt.Println("2. Delete data Medali peserta")
+		fmt.Println("3. <- kembali")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (1/2/3): ")
+		fmt.Scan(&pilihEdit)
+
+		if pilihEdit == "1" {
+			deleteNegara(data, n)
+		} else if pilihEdit == "2" {
+			deleteMedali(data, n)
+		} else if pilihEdit == "3" {
+			kustomisasiData(data, &n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			editData(data, n)
+		}
+	} else {
+		fmt.Println("Data peserta Seagames kosong. Penghapusan tidak dapat dilakukan.")
+		kustomisasiData(data, &n)
+	}
+}
+
+func deleteMedali(data *pesertaSeagames, n int) {
+	var cariApa, medaliApa string
+	var ketemu bool
+	var indexDi int
+	fmt.Print("Ingin menghapus medali dari Negara: ")
+	fmt.Scan(&cariApa)
+	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
+	if ketemu {
+		fmt.Println("-------------------------")
+		fmt.Println("Pilih menghapus medali:")
+		fmt.Println("1. Gold")
+		fmt.Println("2. Silver")
+		fmt.Println("3. Bronze")
+		fmt.Println("4. Semua medali")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (1/2/3/4): ")
+		fmt.Scan(&medaliApa)
+
+		if medaliApa == "1" {
+			data[indexDi].gold = 0
+			fmt.Println("Penghapusan berhasil.")
+			deleteData(data, n)
+		} else if medaliApa == "2" {
+			data[indexDi].silver = 0
+			fmt.Println("Penghapusan berhasil.")
+			deleteData(data, n)
+		} else if medaliApa == "3" {
+			data[indexDi].bronze = 0
+			fmt.Println("Penghapusan berhasil.")
+			deleteData(data, n)
+		} else if medaliApa == "4" {
+			data[indexDi].gold = 0
+			data[indexDi].silver = 0
+			data[indexDi].bronze = 0
+			fmt.Println("Penghapusan berhasil.")
+			deleteData(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			deleteMedali(data, n)
+		}
+	} else {
+		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		deleteMedali(data, n)
+	}
+}
+
+func deleteNegara(data *pesertaSeagames, n int) {
+	var cariApa string
+	var ketemu bool
+	var indexDi int
+	fmt.Print("Ingin menghapus data Negara: ")
+	fmt.Scan(&cariApa)
+	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
+	if ketemu {
+		for i := 0; i < n; i++ {
+			data[i] = data[i+1]
+		}
+		n -= 1
+		fmt.Println("Penghapusan berhasil.")
+		deleteData(data, n)
+	} else {
+		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		deleteNegara(data, n)
 	}
 }
