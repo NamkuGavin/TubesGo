@@ -322,11 +322,11 @@ func editNegara(data *pesertaSeagames, n int) {
 	for i := 0; i < n; i++ {
 		titip[i] = data[i]
 	}
-	fmt.Print("Ingin mengedit nama Negara apa: ")
+	fmt.Print("Ingin mengedit Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
-		fmt.Print("Nama Negara ditemukan. Ubah menjadi: ")
+		fmt.Print("Id Negara ditemukan. Ubah menjadi: ")
 		fmt.Scan(&negaraBaru)
 		fmt.Print("Apakah anda ingin mengedit ini (Y/N)? ")
 		fmt.Scan(&pilih)
@@ -337,7 +337,7 @@ func editNegara(data *pesertaSeagames, n int) {
 				for i := 0; i < n; i++ {
 					data[i].negara = titip[i].negara
 				}
-				fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
+				fmt.Printf("Data Negara %s sudah ada di dalam data. Data peserta negara tidak boleh sama. Silahkan coba lagi.\n", negaraBaru)
 				editNegara(data, n)
 			} else {
 				fmt.Println("Pengeditan selesai.")
@@ -350,7 +350,7 @@ func editNegara(data *pesertaSeagames, n int) {
 			editData(data, n)
 		}
 	} else {
-		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
 		editData(data, n)
 	}
 }
@@ -368,7 +368,7 @@ func editMedali(data *pesertaSeagames, n int) {
 	var pilih string
 	var ketemu bool
 	var indexDi, gold, silver, bronze, cariApa int
-	fmt.Print("Ingin mengedit medali dari Negara apa: ")
+	fmt.Print("Ingin mengedit medali dari Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
@@ -396,7 +396,7 @@ func editMedali(data *pesertaSeagames, n int) {
 			editMedali(data, n)
 		}
 	} else {
-		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
 		editMedali(data, n)
 	}
 }
@@ -433,7 +433,7 @@ func deleteMedali(data *pesertaSeagames, n int) {
 	var medaliApa, pilih string
 	var ketemu bool
 	var indexDi, cariApa int
-	fmt.Print("Ingin menghapus medali dari Negara: ")
+	fmt.Print("Ingin menghapus medali dari Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
@@ -506,7 +506,7 @@ func deleteMedali(data *pesertaSeagames, n int) {
 			deleteMedali(data, n)
 		}
 	} else {
-		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
 		deleteMedali(data, n)
 	}
 }
@@ -515,14 +515,14 @@ func deleteNegara(data *pesertaSeagames, n int) {
 	var pilih string
 	var ketemu bool
 	var indexDi, cariApa int
-	fmt.Print("Ingin menghapus data Negara: ")
+	fmt.Print("Ingin menghapus Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
 	if ketemu {
 		fmt.Print("Apakah anda ingin menghapus data ini (Y/N)? ")
 		fmt.Scan(&pilih)
 		if pilih == "Y" || pilih == "y" {
-			for i := 0; i < n; i++ {
+			for i := indexDi; i < n; i++ {
 				data[i] = data[i+1]
 			}
 			n -= 1
@@ -535,7 +535,7 @@ func deleteNegara(data *pesertaSeagames, n int) {
 			deleteNegara(data, n)
 		}
 	} else {
-		fmt.Println("Nama Negara tidak ditemukan. Silahkan cek kembali.")
+		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
 		deleteNegara(data, n)
 	}
 }
