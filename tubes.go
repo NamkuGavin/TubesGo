@@ -5,8 +5,8 @@ import "fmt"
 const nmax int = 200
 
 type seagames struct {
-	negara               string
-	gold, silver, bronze int
+	negara                                           string
+	gold, silver, bronze, id, rank, tMedali, rankByT int
 }
 
 type pesertaSeagames [nmax]seagames
@@ -104,27 +104,21 @@ func editData(data *pesertaSeagames, n int) {
 }
 
 func cetakData(data pesertaSeagames, n int) {
-	var maxGold, maxSilver, maxBronze bool
 	var maxG, maxS, maxB string
 	if n != 0 {
-		searchFindMax(data, &maxGold, &maxSilver, &maxBronze, n)
-		if maxGold {
-			sortingGoldDesc(&data, n)
-		} else if maxSilver {
-			sortingSilverDesc(&data, n)
-		} else if maxBronze {
-			sortingBronzeDesc(&data, n)
-		}
+		sortingTotal(&data, n)
+		sortingData(&data, n)
 		maxGSB(data, &maxG, &maxS, &maxB, n)
 		fmt.Println()
 		fmt.Println()
-		fmt.Println("--------------------------------")
-		fmt.Printf("%-10s %-4s %-6s %-6s\n", "Negara", "Gold", "Silver", "Bronze")
-		fmt.Println("--------------------------------")
+		fmt.Println("----------------------------------------------------------")
+		fmt.Printf("%-3s %-4s %-11s %-4s %-6s %-6s %-5s %-13s\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
+		fmt.Println("----------------------------------------------------------")
 		for i := 0; i < n; i++ {
-			fmt.Printf("%-10s %-4d %-6d %-6d\n", data[i].negara, data[i].gold, data[i].silver, data[i].bronze)
+			data[i].rank = i + 1
+			fmt.Printf("%03d %-4d %-11s %-4d %-6d %-6d %-5d %-13d\n", data[i].id, data[i].rank, data[i].negara, data[i].gold, data[i].silver, data[i].bronze, data[i].tMedali, data[i].rankByT)
 		}
-		fmt.Println("--------------------------------")
+		fmt.Println("----------------------------------------------------------")
 		fmt.Printf("Negara dengan perolehan Gold terbanyak: %s\n", maxG)
 
 		fmt.Printf("Negara dengan perolehan Silver terbanyak: %s\n", maxS)
@@ -161,23 +155,30 @@ func addData(data *pesertaSeagames, n *int) {
 				for i := *n; i < *n+tambah; i++ {
 					fmt.Printf("%d. ", i+1)
 					fmt.Scan(&negara, &gold, &silver, &bronze)
+					data[i].id = i + 1
 					data[i].negara = negara
 					data[i].gold = gold
 					data[i].silver = silver
 					data[i].bronze = bronze
-				}
-				dataDuplicate = searchDuplicate(*data, *data, *n+tambah)
-				if dataDuplicate {
-					for i := *n; i < *n+tambah; i++ {
+					dataDuplicate = searchDuplicate(*data, *data, i+1)
+					for dataDuplicate {
 						data[i] = dataKosong[i]
+						fmt.Printf("Negara %s sudah ada di dalam data. Data peserta negara tidak boleh sama. Silahkan coba lagi.\n", negara)
+						fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
+						fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
+						fmt.Printf("%d. ", i+1)
+						fmt.Scan(&negara, &gold, &silver, &bronze)
+						data[i].id = i + 1
+						data[i].negara = negara
+						data[i].gold = gold
+						data[i].silver = silver
+						data[i].bronze = bronze
+						dataDuplicate = searchDuplicate(*data, *data, i+1)
 					}
-					fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
-					kustomisasiData(data, n)
-				} else {
-					*n += tambah
-					fmt.Println("Pemasukan data selesai!")
-					kustomisasiData(data, n)
 				}
+				*n += tambah
+				fmt.Println("Pemasukan data selesai!")
+				kustomisasiData(data, n)
 			}
 		} else if pilih == "N" || pilih == "n" {
 			kustomisasiData(data, n)
@@ -201,23 +202,29 @@ func addData(data *pesertaSeagames, n *int) {
 				for i := 0; i < *n; i++ {
 					fmt.Printf("%d. ", i+1)
 					fmt.Scan(&negara, &gold, &silver, &bronze)
+					data[i].id = i + 1
 					data[i].negara = negara
 					data[i].gold = gold
 					data[i].silver = silver
 					data[i].bronze = bronze
-				}
-				dataDuplicate = searchDuplicate(*data, *data, *n)
-				if dataDuplicate {
-					for i := 0; i < *n; i++ {
+					dataDuplicate = searchDuplicate(*data, *data, i+1)
+					for dataDuplicate {
 						data[i] = dataKosong[i]
+						fmt.Printf("Data Negara %s sudah ada di dalam data. Data peserta negara tidak boleh sama. Silahkan coba lagi.\n", negara)
+						fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
+						fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
+						fmt.Printf("%d. ", i+1)
+						fmt.Scan(&negara, &gold, &silver, &bronze)
+						data[i].id = i + 1
+						data[i].negara = negara
+						data[i].gold = gold
+						data[i].silver = silver
+						data[i].bronze = bronze
+						dataDuplicate = searchDuplicate(*data, *data, i+1)
 					}
-					*n = 0
-					fmt.Println("Error. Data peserta negara tidak boleh sama. Silahkan coba lagi.")
-					kustomisasiData(data, n)
-				} else {
-					fmt.Println("Pemasukan data selesai!")
-					kustomisasiData(data, n)
 				}
+				fmt.Println("Pemasukan data selesai!")
+				kustomisasiData(data, n)
 			}
 		} else if pilih == "N" || pilih == "n" {
 			kustomisasiData(data, n)
@@ -236,107 +243,54 @@ func checkingData(n int) bool {
 	return ada
 }
 
-func sortingGoldDesc(data *pesertaSeagames, n int) {
+func sortingTotal(data *pesertaSeagames, n int) {
 	var idx, temp int
 	var tempData seagames
-	for pass := 1; pass < n; pass++ {
-		idx = pass
-		temp = data[pass].gold
-		tempData = data[pass]
-		for idx > 0 && data[idx-1].gold < temp {
-			data[idx] = data[idx-1]
-			idx -= 1
-		}
-		data[idx] = tempData
-	}
-}
-
-func sortingSilverDesc(data *pesertaSeagames, n int) {
-	var idx, temp int
-	var tempData seagames
-	for pass := 1; pass < n; pass++ {
-		idx = pass
-		temp = data[pass].silver
-		tempData = data[pass]
-		for idx > 0 && data[idx-1].silver < temp {
-			data[idx] = data[idx-1]
-			idx -= 1
-		}
-		data[idx] = tempData
-	}
-}
-
-func sortingBronzeDesc(data *pesertaSeagames, n int) {
-	var idx, temp int
-	var tempData seagames
-	for pass := 1; pass < n; pass++ {
-		idx = pass
-		temp = data[pass].bronze
-		tempData = data[pass]
-		for idx > 0 && data[idx-1].bronze < temp {
-			data[idx] = data[idx-1]
-			idx -= 1
-		}
-		data[idx] = tempData
-	}
-}
-
-func searchFindMax(data pesertaSeagames, maxGold, maxSilver, maxBronze *bool, n int) {
-	var max, cek int
-	*maxGold = true
-	*maxSilver = false
-	*maxBronze = false
 	for i := 0; i < n; i++ {
-		if *maxGold {
-			cek = 0
-			if data[i].gold > max {
-				max = data[i].gold
-			}
-			for j := 0; j < n; j++ {
-				if max == data[j].gold {
-					cek++
-				}
-			}
-			if cek >= 2 {
-				*maxGold = false
-				*maxSilver = true
-				*maxBronze = false
-			}
+		data[i].tMedali = data[i].gold + data[i].silver + data[i].bronze
+	}
+	for pass := 1; pass < n; pass++ {
+		idx = pass
+		temp = data[pass].tMedali
+		tempData = data[pass]
+		for idx > 0 && data[idx-1].tMedali < temp {
+			data[idx] = data[idx-1]
+			idx -= 1
 		}
-		if *maxSilver {
-			cek = 0
-			if data[i].silver > max {
-				max = data[i].silver
-			}
-			for j := 0; j < n; j++ {
-				if max == data[j].silver {
-					cek++
-				}
-			}
-			if cek >= 2 {
-				*maxGold = false
-				*maxSilver = false
-				*maxBronze = true
-			}
+		data[idx] = tempData
+	}
+	for i := 0; i < n; i++ {
+		data[i].rankByT = i + 1
+	}
+}
+
+func sortingData(data *pesertaSeagames, n int) {
+	var idx int
+	var tempData, temp seagames
+	for pass := 1; pass < n; pass++ {
+		idx = pass
+		temp = data[pass]
+		tempData = data[pass]
+		for idx > 0 && (data[idx-1].gold < temp.gold || (data[idx-1].gold == temp.gold && data[idx-1].silver < temp.silver) || (data[idx-1].gold == temp.gold && data[idx-1].silver == temp.silver && data[idx-1].bronze < temp.bronze)) {
+			data[idx] = data[idx-1]
+			idx -= 1
 		}
+		data[idx] = tempData
 	}
 }
 
 func maxGSB(data pesertaSeagames, g, s, b *string, n int) {
 	var maxG, maxS, maxB int
-	maxG = data[0].gold
-	maxS = data[0].silver
-	maxB = data[0].bronze
 	for i := 0; i < n; i++ {
-		if data[i].gold >= maxG {
+		if data[i].gold > maxG {
 			maxG = data[i].gold
 			*g = data[i].negara
 		}
-		if data[i].silver >= maxS {
+		if data[i].silver > maxS {
 			maxS = data[i].silver
 			*s = data[i].negara
 		}
-		if data[i].bronze >= maxB {
+		if data[i].bronze > maxB {
 			maxB = data[i].bronze
 			*b = data[i].negara
 		}
@@ -361,9 +315,9 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 }
 
 func editNegara(data *pesertaSeagames, n int) {
-	var cariApa, negaraBaru, pilih string
+	var negaraBaru, pilih string
 	var ketemu, dataDuplicate bool
-	var indexDi int
+	var indexDi, cariApa int
 	var titip pesertaSeagames
 	for i := 0; i < n; i++ {
 		titip[i] = data[i]
@@ -401,9 +355,9 @@ func editNegara(data *pesertaSeagames, n int) {
 	}
 }
 
-func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, indexDi *int) {
+func searchingNegara(data pesertaSeagames, n, cari int, ketemu *bool, indexDi *int) {
 	for i := 0; i < n; i++ {
-		if cari == data[i].negara {
+		if cari == data[i].id {
 			*ketemu = true
 			*indexDi = i
 		}
@@ -411,9 +365,9 @@ func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, ind
 }
 
 func editMedali(data *pesertaSeagames, n int) {
-	var cariApa, pilih string
+	var pilih string
 	var ketemu bool
-	var indexDi, gold, silver, bronze int
+	var indexDi, gold, silver, bronze, cariApa int
 	fmt.Print("Ingin mengedit medali dari Negara apa: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
@@ -476,9 +430,9 @@ func deleteData(data *pesertaSeagames, n int) {
 }
 
 func deleteMedali(data *pesertaSeagames, n int) {
-	var cariApa, medaliApa, pilih string
+	var medaliApa, pilih string
 	var ketemu bool
-	var indexDi int
+	var indexDi, cariApa int
 	fmt.Print("Ingin menghapus medali dari Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
@@ -558,9 +512,9 @@ func deleteMedali(data *pesertaSeagames, n int) {
 }
 
 func deleteNegara(data *pesertaSeagames, n int) {
-	var cariApa, pilih string
+	var pilih string
 	var ketemu bool
-	var indexDi int
+	var indexDi, cariApa int
 	fmt.Print("Ingin menghapus data Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
