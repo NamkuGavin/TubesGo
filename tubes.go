@@ -16,11 +16,12 @@ type arrayKosong [nmax]seagames
 func main() {
 	var data pesertaSeagames
 	var nData int
+	data[0].tMedali = 0
 	mainMenu(data, nData)
 }
 
 func mainMenu(data pesertaSeagames, n int) {
-	var pilihMainMenu string
+	var pilihMainMenu, pilih string
 	fmt.Println()
 	fmt.Println("*************************")
 	fmt.Println("Aplikasi Seagames Manager")
@@ -38,7 +39,16 @@ func mainMenu(data pesertaSeagames, n int) {
 	} else if pilihMainMenu == "2" {
 		cetakData(data, n)
 	} else if pilihMainMenu == "3" {
-		fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini.")
+		fmt.Print("Apakah anda ingin keluar (Y/N)? ")
+		fmt.Scan(&pilih)
+		if pilih == "Y" || pilih == "y" {
+			fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini.")
+		} else if pilih == "N" || pilih == "n" {
+			mainMenu(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			mainMenu(data, n)
+		}
 	} else {
 		fmt.Println("Silahkan input pilihan yang benar.")
 		mainMenu(data, n)
@@ -104,10 +114,13 @@ func editData(data *pesertaSeagames, n int) {
 }
 
 func cetakData(data pesertaSeagames, n int) {
-	var maxG, maxS, maxB string
+	var maxG, maxS, maxB, pilihSort string
 	if n != 0 {
-		sortingTotal(&data, n)
-		sortingData(&data, n)
+		if data[0].tMedali == 0 {
+			sortingTotal(&data, n)
+			sortingMedali(&data, n)
+			fmt.Print("DONE")
+		}
 		maxGSB(data, &maxG, &maxS, &maxB, n)
 		fmt.Println()
 		fmt.Println()
@@ -115,17 +128,38 @@ func cetakData(data pesertaSeagames, n int) {
 		fmt.Printf("%-3s %-4s %-11s %-4s %-6s %-6s %-5s %-13s\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
 		fmt.Println("----------------------------------------------------------")
 		for i := 0; i < n; i++ {
-			data[i].rank = i + 1
 			fmt.Printf("%03d %-4d %-11s %-4d %-6d %-6d %-5d %-13d\n", data[i].id, data[i].rank, data[i].negara, data[i].gold, data[i].silver, data[i].bronze, data[i].tMedali, data[i].rankByT)
 		}
 		fmt.Println("----------------------------------------------------------")
 		fmt.Printf("Negara dengan perolehan Gold terbanyak: %s\n", maxG)
-
 		fmt.Printf("Negara dengan perolehan Silver terbanyak: %s\n", maxS)
 		fmt.Printf("Negara dengan perolehan Bronze terbanyak: %s\n", maxB)
 		fmt.Println()
 		fmt.Println()
-		mainMenu(data, n)
+		fmt.Println("Pilih:")
+		fmt.Println("1. Sorting berdasarkan 'Medali'")
+		fmt.Println("2. Sorting berdasarkan 'Rank by Total'")
+		fmt.Println("3. Sorting berdasarkan 'Team/NOC'")
+		fmt.Println("4. <- kembali")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (1/2/3/4): ")
+		fmt.Scan(&pilihSort)
+
+		if pilihSort == "1" {
+			sortingMedali(&data, n)
+			cetakData(data, n)
+		} else if pilihSort == "2" {
+			sortingRankbyT(&data, n)
+			cetakData(data, n)
+		} else if pilihSort == "3" {
+			sortingNegara(&data, n)
+			cetakData(data, n)
+		} else if pilihSort == "4" {
+			mainMenu(data, n)
+		} else {
+			fmt.Println("Silahkan input pilihan yang benar.")
+			cetakData(data, n)
+		}
 	} else {
 		fmt.Println("Belum ada data peserta Seagames yang dimasukkan. Silahkan lakukan input data.")
 		mainMenu(data, n)
@@ -264,7 +298,38 @@ func sortingTotal(data *pesertaSeagames, n int) {
 	}
 }
 
-func sortingData(data *pesertaSeagames, n int) {
+func sortingNegara(data *pesertaSeagames, n int) {
+	var idx int
+	var temp string
+	var tempData seagames
+	for pass := 1; pass < n; pass++ {
+		idx = pass
+		temp = data[pass].negara
+		tempData = data[pass]
+		for idx > 0 && data[idx-1].negara < temp {
+			data[idx] = data[idx-1]
+			idx -= 1
+		}
+		data[idx] = tempData
+	}
+}
+
+func sortingRankbyT(data *pesertaSeagames, n int) {
+	var idx, temp int
+	var tempData seagames
+	for pass := 1; pass < n; pass++ {
+		idx = pass
+		temp = data[pass].rankByT
+		tempData = data[pass]
+		for idx > 0 && data[idx-1].rankByT < temp {
+			data[idx] = data[idx-1]
+			idx -= 1
+		}
+		data[idx] = tempData
+	}
+}
+
+func sortingMedali(data *pesertaSeagames, n int) {
 	var idx int
 	var tempData, temp seagames
 	for pass := 1; pass < n; pass++ {
@@ -276,6 +341,9 @@ func sortingData(data *pesertaSeagames, n int) {
 			idx -= 1
 		}
 		data[idx] = tempData
+	}
+	for i := 0; i < n; i++ {
+		data[i].rank = i + 1
 	}
 }
 
