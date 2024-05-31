@@ -1,26 +1,39 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+
+	"github.com/google/uuid"
+)
 
 const nmax int = 200
 
 type seagames struct {
-	negara                                           string
-	gold, silver, bronze, id, rank, tMedali, rankByT int
+	negara, id                                   string
+	gold, silver, bronze, rank, tMedali, rankByT int
 }
 
 type pesertaSeagames [nmax]seagames
 
 type arrayKosong [nmax]seagames
 
+type recycleID [nmax]string
+
 func main() {
 	var data pesertaSeagames
 	var nData int
+	var recycleId recycleID
+	for i := 0; i < nmax; i++ {
+		recycleId[i] = "-"
+	}
 	data[0].tMedali = 0
-	mainMenu(data, nData)
+	mainMenu(data, nData, recycleId)
 }
 
-func mainMenu(data pesertaSeagames, n int) {
+func mainMenu(data pesertaSeagames, n int, recycle recycleID) {
 	var pilihMainMenu, pilih string
 	fmt.Println()
 	fmt.Println("*************************")
@@ -35,27 +48,27 @@ func mainMenu(data pesertaSeagames, n int) {
 	fmt.Scan(&pilihMainMenu)
 
 	if pilihMainMenu == "1" {
-		kustomisasiData(&data, &n)
+		kustomisasiData(&data, &n, &recycle)
 	} else if pilihMainMenu == "2" {
-		cetakData(data, n)
+		cetakData(data, n, recycle)
 	} else if pilihMainMenu == "3" {
 		fmt.Print("Apakah anda ingin keluar (Y/N)? ")
 		fmt.Scan(&pilih)
 		if pilih == "Y" || pilih == "y" {
 			fmt.Println("Keluar. Terima kasih telah mencoba aplikasi ini.")
 		} else if pilih == "N" || pilih == "n" {
-			mainMenu(data, n)
+			mainMenu(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			mainMenu(data, n)
+			mainMenu(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Silahkan input pilihan yang benar.")
-		mainMenu(data, n)
+		mainMenu(data, n, recycle)
 	}
 }
 
-func kustomisasiData(data *pesertaSeagames, n *int) {
+func kustomisasiData(data *pesertaSeagames, n *int, recycle *recycleID) {
 	var pilihCustom string
 	fmt.Println()
 	fmt.Println("************************")
@@ -71,20 +84,20 @@ func kustomisasiData(data *pesertaSeagames, n *int) {
 	fmt.Scan(&pilihCustom)
 
 	if pilihCustom == "1" {
-		addData(data, n)
+		addData(data, n, recycle)
 	} else if pilihCustom == "2" {
-		editData(data, *n)
+		editData(data, *n, *recycle)
 	} else if pilihCustom == "3" {
-		deleteData(data, *n)
+		deleteData(data, *n, recycle)
 	} else if pilihCustom == "4" {
-		mainMenu(*data, *n)
+		mainMenu(*data, *n, *recycle)
 	} else {
 		fmt.Println("Silahkan input pilihan yang benar.")
-		kustomisasiData(data, n)
+		kustomisasiData(data, n, recycle)
 	}
 }
 
-func editData(data *pesertaSeagames, n int) {
+func editData(data *pesertaSeagames, n int, recycle recycleID) {
 	if n != 0 {
 		var pilihEdit string
 		fmt.Println()
@@ -98,29 +111,24 @@ func editData(data *pesertaSeagames, n int) {
 		fmt.Scan(&pilihEdit)
 
 		if pilihEdit == "1" {
-			editNegara(data, n)
+			editNegara(data, n, recycle)
 		} else if pilihEdit == "2" {
-			editMedali(data, n)
+			editMedali(data, n, recycle)
 		} else if pilihEdit == "3" {
-			kustomisasiData(data, &n)
+			kustomisasiData(data, &n, &recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			editData(data, n)
+			editData(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Data peserta Seagames kosong. Pengeditan tidak dapat dilakukan.")
-		kustomisasiData(data, &n)
+		kustomisasiData(data, &n, &recycle)
 	}
 }
 
-func cetakData(data pesertaSeagames, n int) {
+func cetakData(data pesertaSeagames, n int, recycle recycleID) {
 	var maxG, maxS, maxB, pilihSort string
 	if n != 0 {
-		if data[0].tMedali == 0 {
-			sortingTotal(&data, n)
-			sortingMedali(&data, n)
-			fmt.Print("DONE")
-		}
 		maxGSB(data, &maxG, &maxS, &maxB, n)
 		fmt.Println()
 		fmt.Println()
@@ -128,7 +136,7 @@ func cetakData(data pesertaSeagames, n int) {
 		fmt.Printf("%-3s %-4s %-11s %-4s %-6s %-6s %-5s %-13s\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
 		fmt.Println("----------------------------------------------------------")
 		for i := 0; i < n; i++ {
-			fmt.Printf("%03d %-4d %-11s %-4d %-6d %-6d %-5d %-13d\n", data[i].id, data[i].rank, data[i].negara, data[i].gold, data[i].silver, data[i].bronze, data[i].tMedali, data[i].rankByT)
+			fmt.Printf("%-3s %-4d %-11s %-4d %-6d %-6d %-5d %-13d\n", data[i].id, data[i].rank, data[i].negara, data[i].gold, data[i].silver, data[i].bronze, data[i].tMedali, data[i].rankByT)
 		}
 		fmt.Println("----------------------------------------------------------")
 		fmt.Printf("Negara dengan perolehan Gold terbanyak: %s\n", maxG)
@@ -147,31 +155,31 @@ func cetakData(data pesertaSeagames, n int) {
 
 		if pilihSort == "1" {
 			sortingMedali(&data, n)
-			cetakData(data, n)
+			cetakData(data, n, recycle)
 		} else if pilihSort == "2" {
 			sortingRankbyT(&data, n)
-			cetakData(data, n)
+			cetakData(data, n, recycle)
 		} else if pilihSort == "3" {
 			sortingNegara(&data, n)
-			cetakData(data, n)
+			cetakData(data, n, recycle)
 		} else if pilihSort == "4" {
-			mainMenu(data, n)
+			mainMenu(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			cetakData(data, n)
+			cetakData(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Belum ada data peserta Seagames yang dimasukkan. Silahkan lakukan input data.")
-		mainMenu(data, n)
+		mainMenu(data, n, recycle)
 	}
 }
 
-func addData(data *pesertaSeagames, n *int) {
+func addData(data *pesertaSeagames, n *int, recycle *recycleID) {
 	var dataKosong arrayKosong
-	var adaKah, dataDuplicate bool
+	var adaKah, dataDuplicate, nemuId bool
 	var tambah int
 	var negara, pilih string
-	var gold, silver, bronze int
+	var gold, silver, bronze, index int
 	adaKah = checkingData(*n)
 	if adaKah {
 		fmt.Print("Terdapat data yang sudah tersimpan. Apakah anda ingin menambahkan data (Y/N)? ")
@@ -182,14 +190,25 @@ func addData(data *pesertaSeagames, n *int) {
 			fmt.Scan(&tambah)
 			if *n+tambah > nmax {
 				fmt.Println("Mohon maaf. Data tidak bisa lebih dari 200. Silahkan input lagi.")
-				addData(data, n)
+				addData(data, n, recycle)
 			} else {
 				fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
 				fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
 				for i := *n; i < *n+tambah; i++ {
 					fmt.Printf("%d. ", i+1)
 					fmt.Scan(&negara, &gold, &silver, &bronze)
-					data[i].id = i + 1
+					id := uuid.New()
+					for !nemuId && index < nmax {
+						if recycle[index] != "-" {
+							nemuId = true
+							data[i].id = recycle[index]
+							recycle[index] = ""
+						}
+						index++
+					}
+					if !nemuId {
+						data[i].id = id.String()[:3]
+					}
 					data[i].negara = negara
 					data[i].gold = gold
 					data[i].silver = silver
@@ -202,7 +221,18 @@ func addData(data *pesertaSeagames, n *int) {
 						fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
 						fmt.Printf("%d. ", i+1)
 						fmt.Scan(&negara, &gold, &silver, &bronze)
-						data[i].id = i + 1
+						id := uuid.New()
+						for !nemuId && index < nmax {
+							if recycle[index] != "-" {
+								nemuId = true
+								data[i].id = recycle[index]
+								recycle[index] = ""
+							}
+							index++
+						}
+						if !nemuId {
+							data[i].id = id.String()[:3]
+						}
 						data[i].negara = negara
 						data[i].gold = gold
 						data[i].silver = silver
@@ -212,13 +242,17 @@ func addData(data *pesertaSeagames, n *int) {
 				}
 				*n += tambah
 				fmt.Println("Pemasukan data selesai!")
-				kustomisasiData(data, n)
+				if data[*n-1].tMedali == 0 {
+					sortingTotal(data, *n)
+				}
+				sortingMedali(data, *n)
+				kustomisasiData(data, n, recycle)
 			}
 		} else if pilih == "N" || pilih == "n" {
-			kustomisasiData(data, n)
+			kustomisasiData(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			addData(data, n)
+			addData(data, n, recycle)
 		}
 	} else {
 		fmt.Print("Belum ada data yang tersimpan. Apakah anda ingin menambahkan data (Y/N)? ")
@@ -229,14 +263,15 @@ func addData(data *pesertaSeagames, n *int) {
 			if *n > nmax {
 				fmt.Println("Mohon maaf. Data tidak bisa menampung lebih dari 200. Silahkan input lagi.")
 				*n = 0
-				addData(data, n)
+				addData(data, n, recycle)
 			} else {
 				fmt.Println("Silahkan masukkan data peserta Negara dan Medali nya!")
 				fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
 				for i := 0; i < *n; i++ {
 					fmt.Printf("%d. ", i+1)
 					fmt.Scan(&negara, &gold, &silver, &bronze)
-					data[i].id = i + 1
+					id := uuid.New()
+					data[i].id = id.String()[:3]
 					data[i].negara = negara
 					data[i].gold = gold
 					data[i].silver = silver
@@ -249,7 +284,8 @@ func addData(data *pesertaSeagames, n *int) {
 						fmt.Println("dengan format: <Negara> <Gold> <Silver> <Bronze>")
 						fmt.Printf("%d. ", i+1)
 						fmt.Scan(&negara, &gold, &silver, &bronze)
-						data[i].id = i + 1
+						id := uuid.New()
+						data[i].id = id.String()[:3]
 						data[i].negara = negara
 						data[i].gold = gold
 						data[i].silver = silver
@@ -258,13 +294,17 @@ func addData(data *pesertaSeagames, n *int) {
 					}
 				}
 				fmt.Println("Pemasukan data selesai!")
-				kustomisasiData(data, n)
+				if data[*n-1].tMedali == 0 {
+					sortingTotal(data, *n)
+				}
+				sortingMedali(data, *n)
+				kustomisasiData(data, n, recycle)
 			}
 		} else if pilih == "N" || pilih == "n" {
-			kustomisasiData(data, n)
+			kustomisasiData(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			addData(data, n)
+			addData(data, n, recycle)
 		}
 	}
 }
@@ -306,7 +346,7 @@ func sortingNegara(data *pesertaSeagames, n int) {
 		idx = pass
 		temp = data[pass].negara
 		tempData = data[pass]
-		for idx > 0 && data[idx-1].negara < temp {
+		for idx > 0 && data[idx-1].negara > temp {
 			data[idx] = data[idx-1]
 			idx -= 1
 		}
@@ -321,7 +361,7 @@ func sortingRankbyT(data *pesertaSeagames, n int) {
 		idx = pass
 		temp = data[pass].rankByT
 		tempData = data[pass]
-		for idx > 0 && data[idx-1].rankByT < temp {
+		for idx > 0 && data[idx-1].rankByT > temp {
 			data[idx] = data[idx-1]
 			idx -= 1
 		}
@@ -382,10 +422,10 @@ func searchDuplicate(data, tampungan pesertaSeagames, n int) bool {
 	return cek >= 2
 }
 
-func editNegara(data *pesertaSeagames, n int) {
-	var negaraBaru, pilih string
+func editNegara(data *pesertaSeagames, n int, recycle recycleID) {
+	var negaraBaru, pilih, cariApa string
 	var ketemu, dataDuplicate bool
-	var indexDi, cariApa int
+	var indexDi int
 	var titip pesertaSeagames
 	for i := 0; i < n; i++ {
 		titip[i] = data[i]
@@ -406,24 +446,24 @@ func editNegara(data *pesertaSeagames, n int) {
 					data[i].negara = titip[i].negara
 				}
 				fmt.Printf("Data Negara %s sudah ada di dalam data. Data peserta negara tidak boleh sama. Silahkan coba lagi.\n", negaraBaru)
-				editNegara(data, n)
+				editNegara(data, n, recycle)
 			} else {
 				fmt.Println("Pengeditan selesai.")
-				editData(data, n)
+				editData(data, n, recycle)
 			}
 		} else if pilih == "N" || pilih == "n" {
-			editData(data, n)
+			editData(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			editData(data, n)
+			editData(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
-		editData(data, n)
+		editData(data, n, recycle)
 	}
 }
 
-func searchingNegara(data pesertaSeagames, n, cari int, ketemu *bool, indexDi *int) {
+func searchingNegara(data pesertaSeagames, n int, cari string, ketemu *bool, indexDi *int) {
 	for i := 0; i < n; i++ {
 		if cari == data[i].id {
 			*ketemu = true
@@ -432,10 +472,10 @@ func searchingNegara(data pesertaSeagames, n, cari int, ketemu *bool, indexDi *i
 	}
 }
 
-func editMedali(data *pesertaSeagames, n int) {
-	var pilih string
+func editMedali(data *pesertaSeagames, n int, recycle recycleID) {
+	var pilih, cariApa string
 	var ketemu bool
-	var indexDi, gold, silver, bronze, cariApa int
+	var indexDi, gold, silver, bronze int
 	fmt.Print("Ingin mengedit medali dari Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
@@ -456,20 +496,20 @@ func editMedali(data *pesertaSeagames, n int) {
 				data[indexDi].bronze = bronze
 			}
 			fmt.Println("Pengeditan Selesai")
-			editData(data, n)
+			editData(data, n, recycle)
 		} else if pilih == "N" || pilih == "n" {
-			editData(data, n)
+			editData(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			editMedali(data, n)
+			editMedali(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
-		editMedali(data, n)
+		editMedali(data, n, recycle)
 	}
 }
 
-func deleteData(data *pesertaSeagames, n int) {
+func deleteData(data *pesertaSeagames, n int, recycle *recycleID) {
 	if n != 0 {
 		var pilihEdit string
 		fmt.Println("-------------------------")
@@ -482,25 +522,25 @@ func deleteData(data *pesertaSeagames, n int) {
 		fmt.Scan(&pilihEdit)
 
 		if pilihEdit == "1" {
-			deleteNegara(data, n)
+			deleteNegara(data, n, recycle)
 		} else if pilihEdit == "2" {
-			deleteMedali(data, n)
+			deleteMedali(data, n, *recycle)
 		} else if pilihEdit == "3" {
-			kustomisasiData(data, &n)
+			kustomisasiData(data, &n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			editData(data, n)
+			editData(data, n, *recycle)
 		}
 	} else {
 		fmt.Println("Data peserta Seagames kosong. Penghapusan tidak dapat dilakukan.")
-		kustomisasiData(data, &n)
+		kustomisasiData(data, &n, recycle)
 	}
 }
 
-func deleteMedali(data *pesertaSeagames, n int) {
-	var medaliApa, pilih string
+func deleteMedali(data *pesertaSeagames, n int, recycle recycleID) {
+	var medaliApa, pilih, cariApa string
 	var ketemu bool
-	var indexDi, cariApa int
+	var indexDi int
 	fmt.Print("Ingin menghapus medali dari Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
@@ -521,12 +561,12 @@ func deleteMedali(data *pesertaSeagames, n int) {
 			if pilih == "Y" || pilih == "y" {
 				data[indexDi].gold = 0
 				fmt.Println("Penghapusan berhasil.")
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else if pilih == "N" || pilih == "n" {
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else {
 				fmt.Println("Silahkan input pilihan yang benar.")
-				deleteMedali(data, n)
+				deleteMedali(data, n, recycle)
 			}
 		} else if medaliApa == "2" {
 			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
@@ -534,12 +574,12 @@ func deleteMedali(data *pesertaSeagames, n int) {
 			if pilih == "Y" || pilih == "y" {
 				data[indexDi].silver = 0
 				fmt.Println("Penghapusan berhasil.")
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else if pilih == "N" || pilih == "n" {
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else {
 				fmt.Println("Silahkan input pilihan yang benar.")
-				deleteMedali(data, n)
+				deleteMedali(data, n, recycle)
 			}
 		} else if medaliApa == "3" {
 			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
@@ -547,12 +587,12 @@ func deleteMedali(data *pesertaSeagames, n int) {
 			if pilih == "Y" || pilih == "y" {
 				data[indexDi].bronze = 0
 				fmt.Println("Penghapusan berhasil.")
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else if pilih == "N" || pilih == "n" {
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else {
 				fmt.Println("Silahkan input pilihan yang benar.")
-				deleteMedali(data, n)
+				deleteMedali(data, n, recycle)
 			}
 		} else if medaliApa == "4" {
 			fmt.Print("Apakah anda ingin menghapus data ini (Y/N)?")
@@ -562,27 +602,27 @@ func deleteMedali(data *pesertaSeagames, n int) {
 				data[indexDi].silver = 0
 				data[indexDi].bronze = 0
 				fmt.Println("Penghapusan berhasil.")
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else if pilih == "N" || pilih == "n" {
-				deleteData(data, n)
+				deleteData(data, n, &recycle)
 			} else {
 				fmt.Println("Silahkan input pilihan yang benar.")
-				deleteMedali(data, n)
+				deleteMedali(data, n, recycle)
 			}
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			deleteMedali(data, n)
+			deleteMedali(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
-		deleteMedali(data, n)
+		deleteMedali(data, n, recycle)
 	}
 }
 
-func deleteNegara(data *pesertaSeagames, n int) {
-	var pilih string
+func deleteNegara(data *pesertaSeagames, n int, recycle *recycleID) {
+	var pilih, cariApa string
 	var ketemu bool
-	var indexDi, cariApa int
+	var indexDi int
 	fmt.Print("Ingin menghapus Id Negara: ")
 	fmt.Scan(&cariApa)
 	searchingNegara(*data, n, cariApa, &ketemu, &indexDi)
@@ -590,20 +630,33 @@ func deleteNegara(data *pesertaSeagames, n int) {
 		fmt.Print("Apakah anda ingin menghapus data ini (Y/N)? ")
 		fmt.Scan(&pilih)
 		if pilih == "Y" || pilih == "y" {
+			recycle[indexDi] = data[indexDi].id
 			for i := indexDi; i < n; i++ {
 				data[i] = data[i+1]
 			}
 			n -= 1
 			fmt.Println("Penghapusan berhasil.")
-			deleteData(data, n)
+			deleteData(data, n, recycle)
 		} else if pilih == "N" || pilih == "n" {
-			deleteData(data, n)
+			deleteData(data, n, recycle)
 		} else {
 			fmt.Println("Silahkan input pilihan yang benar.")
-			deleteNegara(data, n)
+			deleteNegara(data, n, recycle)
 		}
 	} else {
 		fmt.Println("Id Negara tidak ditemukan. Silahkan cek kembali.")
-		deleteNegara(data, n)
+		deleteNegara(data, n, recycle)
+	}
+}
+
+func clearScreen() {
+	if runtime.GOOS == "windows" {
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	} else {
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
 	}
 }
