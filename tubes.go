@@ -42,7 +42,7 @@ func mainHeader(data pesertaSeagames, n int, recycle recycleID) {
 	fmt.Println("==================================================")
 	if n != 0 {
 		fmt.Println("data seagames:")
-		cetakData(data, n, recycle)
+		cetakData(data, n)
 		fmt.Println()
 	} else {
 		fmt.Println("data seagames:")
@@ -92,11 +92,144 @@ func searchData(data pesertaSeagames, n int, recycle recycleID, dataSearch *arra
 	} else if pilihMainMenu == "2" {
 		searchName(data, dataSearch, n, recycle, nCari)
 	} else if pilihMainMenu == "3" {
-
+		searchRank(data, dataSearch, n, recycle, nCari)
+	} else if pilihMainMenu == "4" {
+		searchMedal(data, dataSearch, n, recycle, nCari)
 	} else if pilihMainMenu == "5" {
 		mainMenu(data, n, recycle)
 	} else {
 		popUp("Silahkan input pilihan yang benar. tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	}
+}
+
+func searchMedal(data pesertaSeagames, dataSearch *arraySearch, n int, recycle recycleID, nCari *int) {
+	var dataKosong arrayKosong
+	var g, s, b, index int
+	var medaliApa string
+	for i := 0; i < n; i++ {
+		dataSearch[i] = dataKosong[i]
+	}
+	*nCari = 0
+	fmt.Scanln()
+	fmt.Println()
+	fmt.Println("============ MENU PENCARIAN ============")
+	fmt.Println("|1. Gold                               |")
+	fmt.Println("|2. Silver                             |")
+	fmt.Println("|3. Bronze                             |")
+	fmt.Println("|4. Semua medali                       |")
+	fmt.Println("========================================")
+	fmt.Print("Pilih opsi (1/2/3/4): ")
+	fmt.Scan(&medaliApa)
+
+	if medaliApa == "4" {
+		fmt.Println("Masukkan medali yang anda cari!")
+		fmt.Print("dengan format <Gold> <Silver> <Bronze>: ")
+		fmt.Scan(&g, &s, &b)
+		for i := 0; i < n; i++ {
+			if g == data[i].gold && s == data[i].silver && b == data[i].bronze {
+				dataSearch[index] = data[i]
+				index++
+				*nCari++
+			}
+		}
+		if *nCari != 0 {
+			sortingMedaliSearch(dataSearch, n)
+			popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		} else {
+			popUp("Pencarian gagal!. Tidak ada data gold, silver, dan bronze yang anda masukkan. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		}
+	} else if medaliApa == "3" {
+		fmt.Println("Masukkan medali yang anda cari!")
+		fmt.Print("dengan format <Bronze>: ")
+		fmt.Scan(&b)
+		for i := 0; i < n; i++ {
+			if b == data[i].bronze {
+				dataSearch[index] = data[i]
+				index++
+				*nCari++
+			}
+		}
+		if *nCari != 0 {
+			sortingMedaliSearch(dataSearch, n)
+			popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		} else {
+			popUp("Pencarian gagal!. Tidak ada data bronze yang anda masukkan. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		}
+	} else if medaliApa == "2" {
+		fmt.Println("Masukkan medali yang anda cari!")
+		fmt.Print("dengan format <Silver>: ")
+		fmt.Scan(&s)
+		for i := 0; i < n; i++ {
+			if s == data[i].silver {
+				dataSearch[index] = data[i]
+				index++
+				*nCari++
+			}
+		}
+		if *nCari != 0 {
+			sortingMedaliSearch(dataSearch, n)
+			popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		} else {
+			popUp("Pencarian gagal!. Tidak ada data silver yang anda masukkan. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		}
+	} else if medaliApa == "1" {
+		fmt.Println("Masukkan medali yang anda cari!")
+		fmt.Print("dengan format <Gold>: ")
+		fmt.Scan(&g)
+		for i := 0; i < n; i++ {
+			if g == data[i].gold {
+				dataSearch[index] = data[i]
+				index++
+				*nCari++
+			}
+		}
+		if *nCari != 0 {
+			sortingMedaliSearch(dataSearch, n)
+			popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		} else {
+			popUp("Pencarian gagal!. Tidak ada data gold yang anda masukkan. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		}
+	} else {
+		fmt.Println("Silahkan input pilihan yang benar.")
+		searchMedal(data, dataSearch, n, recycle, nCari)
+	}
+}
+
+func searchRank(data pesertaSeagames, dataSearch *arraySearch, n int, recycle recycleID, nCari *int) {
+	var index, min, max int
+	var dataKosong arrayKosong
+	for i := 0; i < n; i++ {
+		dataSearch[i] = dataKosong[i]
+	}
+	*nCari = 0
+	fmt.Scanln()
+	fmt.Println("Masukkan batas Rank minimum dan maksimum!")
+	fmt.Print("Minimum: ")
+	fmt.Scan(&min)
+	fmt.Print("Maksimum: ")
+	fmt.Scan(&max)
+	for i := 0; i < n; i++ {
+		if data[i].rank >= min && data[i].rank <= max {
+			dataSearch[index] = data[i]
+			index++
+			*nCari++
+		}
+	}
+	if *nCari != 0 {
+		sortingMedaliSearch(dataSearch, n)
+		popUp("Pembatasan berhasil!. Tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	} else {
+		popUp("Pembatasan gagal!. Nilai batas Rank yang anda masukkan tidak valid. Tekan 'enter' untuk melanjutkan")
 		searchData(data, n, recycle, dataSearch, nCari)
 	}
 }
@@ -123,12 +256,18 @@ func searchAlphabet(data pesertaSeagames, dataSearch *arraySearch, n int, recycl
 				*nCari++
 			}
 		}
-		popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
-		searchData(data, n, recycle, dataSearch, nCari)
+		if *nCari != 0 {
+			popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		} else {
+			popUp("Pencarian gagal!. Negara dengan alphabet ini tidak ada. Tekan 'enter' untuk melanjutkan")
+			searchData(data, n, recycle, dataSearch, nCari)
+		}
 	} else {
 		fmt.Println("Silahkan input alphabet yang benar.")
 		searchAlphabet(data, dataSearch, n, recycle, nCari)
 	}
+
 }
 
 func contains(namaNegara, diCari string) bool {
@@ -279,7 +418,7 @@ func center(s string, w int) string {
 	return fmt.Sprintf("%[1]*s", -w, fmt.Sprintf("%[1]*s", (w+len(s))/2, s))
 }
 
-func cetakData(data pesertaSeagames, n int, recycle recycleID) {
+func cetakData(data pesertaSeagames, n int) {
 	fmt.Println("---------------------------------------------------------------------------------------")
 	fmt.Printf("|%-4v|%-5v|%-30v|%-5v|%-7v|%-7v|%-6v|%-14v|\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
 	fmt.Println("---------------------------------------------------------------------------------------")
@@ -607,6 +746,21 @@ func sortingOptMedali(data *pesertaSeagames, n int, pilihanSort string) {
 	}
 }
 
+func sortingMedaliSearch(data *arraySearch, n int) {
+	var idx int
+	var tempData, temp seagames
+	for pass := 1; pass < n; pass++ {
+		idx = pass
+		temp = data[pass]
+		tempData = data[pass]
+		for idx > 0 && (data[idx-1].gold < temp.gold || (data[idx-1].gold == temp.gold && data[idx-1].silver < temp.silver) || (data[idx-1].gold == temp.gold && data[idx-1].silver == temp.silver && data[idx-1].bronze < temp.bronze) || (data[idx-1].gold == temp.gold && data[idx-1].silver == temp.silver && data[idx-1].bronze == temp.bronze && data[idx-1].rank > temp.rank)) {
+			data[idx] = data[idx-1]
+			idx -= 1
+		}
+		data[idx] = tempData
+	}
+}
+
 func sortingMedali(data *pesertaSeagames, n int) {
 	var idx int
 	var tempData, temp seagames
@@ -622,24 +776,6 @@ func sortingMedali(data *pesertaSeagames, n int) {
 	}
 	for i := 0; i < n; i++ {
 		data[i].rank = i + 1
-	}
-}
-
-func maxGSB(data pesertaSeagames, g, s, b *string, n int) {
-	var maxG, maxS, maxB int
-	for i := 0; i < n; i++ {
-		if data[i].gold > maxG {
-			maxG = data[i].gold
-			*g = data[i].negara
-		}
-		if data[i].silver > maxS {
-			maxS = data[i].silver
-			*s = data[i].negara
-		}
-		if data[i].bronze > maxB {
-			maxB = data[i].bronze
-			*b = data[i].negara
-		}
 	}
 }
 
