@@ -23,6 +23,8 @@ type arrayKosong [nmax]seagames
 
 type recycleID [nmax]string
 
+type arraySearch [nmax]seagames
+
 func main() {
 	var data pesertaSeagames
 	var nData int
@@ -49,23 +51,137 @@ func mainHeader(data pesertaSeagames, n int, recycle recycleID) {
 	}
 }
 
+func searchHeader(data arraySearch, n int) {
+	fmt.Println("==================================================")
+	fmt.Println("          Aplikasi Seagames Manager               ")
+	fmt.Println("==================================================")
+	if n != 0 {
+		fmt.Println("search seagames:")
+		cetakSearch(data, n)
+		fmt.Println()
+	} else {
+		fmt.Println("search seagames:")
+		fmt.Println("Belum ada data pencarian yang dimasukkan.")
+		fmt.Println()
+	}
+}
+
 func popUp(kalimat string) {
 	fmt.Println(kalimat)
 	fmt.Scanln()
 	fmt.Scanln()
 }
 
+func searchData(data pesertaSeagames, n int, recycle recycleID, dataSearch *arraySearch, nCari *int) {
+	clearScreen()
+	var pilihMainMenu string
+	fmt.Println()
+	searchHeader(*dataSearch, *nCari)
+	fmt.Println("============ MENU PENCARIAN ============")
+	fmt.Println("|1. Alphabet                           |")
+	fmt.Println("|2. Nama                               |")
+	fmt.Println("|3. batas Rank                         |")
+	fmt.Println("|4. Perolehan Medali                   |")
+	fmt.Println("|5. <- Kembali                         |")
+	fmt.Println("========================================")
+	fmt.Print("Pilih opsi (1/2/3/4/5): ")
+	fmt.Scan(&pilihMainMenu)
+
+	if pilihMainMenu == "1" {
+		searchAlphabet(data, dataSearch, n, recycle, nCari)
+	} else if pilihMainMenu == "2" {
+		searchName(data, dataSearch, n, recycle, nCari)
+	} else if pilihMainMenu == "3" {
+
+	} else if pilihMainMenu == "5" {
+		mainMenu(data, n, recycle)
+	} else {
+		popUp("Silahkan input pilihan yang benar. tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	}
+}
+
+func searchAlphabet(data pesertaSeagames, dataSearch *arraySearch, n int, recycle recycleID, nCari *int) {
+	var alphabet byte
+	var index int
+	var dataKosong arrayKosong
+	for i := 0; i < n; i++ {
+		dataSearch[i] = dataKosong[i]
+	}
+	*nCari = 0
+	fmt.Scanln()
+	fmt.Print("Masukkan alphabet (A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z): ")
+	fmt.Scanf("%c", &alphabet)
+	if (alphabet >= 65 && alphabet <= 90) || (alphabet >= 97 && alphabet <= 122) {
+		if alphabet >= 97 && alphabet <= 122 {
+			alphabet -= 32
+		}
+		for i := 0; i < n; i++ {
+			if alphabet == data[i].negara[0] {
+				dataSearch[index] = data[i]
+				index++
+				*nCari++
+			}
+		}
+		popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	} else {
+		fmt.Println("Silahkan input alphabet yang benar.")
+		searchAlphabet(data, dataSearch, n, recycle, nCari)
+	}
+}
+
+func contains(namaNegara, diCari string) bool {
+	var contain bool
+	for i := 0; i <= len(namaNegara)-len(diCari); i++ {
+		if namaNegara[i:i+len(diCari)] == diCari {
+			contain = true
+		}
+	}
+	return contain
+}
+
+func searchName(data pesertaSeagames, dataSearch *arraySearch, n int, recycle recycleID, nCari *int) {
+	var country string
+	var index int
+	var dataKosong arrayKosong
+	for i := 0; i < n; i++ {
+		dataSearch[i] = dataKosong[i]
+	}
+	*nCari = 0
+	fmt.Scanln()
+	fmt.Print("Masukkan nama negara: ")
+	fmt.Scan(&country)
+	for i := 0; i < n; i++ {
+		if contains(data[i].negara, country) {
+			dataSearch[index] = data[i]
+			index++
+			*nCari++
+		}
+	}
+	if *nCari != 0 {
+		popUp("Pencarian berhasil!. Tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	} else {
+		popUp("Pencarian gagal!. Tidak ada nama negara yang dicari. Tekan 'enter' untuk melanjutkan")
+		searchData(data, n, recycle, dataSearch, nCari)
+	}
+}
+
 func mainMenu(data pesertaSeagames, n int, recycle recycleID) {
 	clearScreen()
 	var pilihMainMenu, pilih string
+	var dataSearch arraySearch
+	var nSearch int
 	fmt.Println()
 	mainHeader(data, n, recycle)
 	fmt.Println("================= MENU =================")
 	fmt.Println("|1. Kustomisasi data peserta Seagames  |")
 	fmt.Println("|2. Ubah sorting                       |")
-	fmt.Println("|3. Keluar                             |")
+	fmt.Println("|3. Cari peserta                       |")
+	fmt.Println("|4. Keluar                             |")
 	fmt.Println("========================================")
-	fmt.Print("Pilih opsi (1/2/3): ")
+	fmt.Print("Pilih opsi (1/2/3/4): ")
 	fmt.Scan(&pilihMainMenu)
 
 	if pilihMainMenu == "1" {
@@ -78,6 +194,13 @@ func mainMenu(data pesertaSeagames, n int, recycle recycleID) {
 			mainMenu(data, n, recycle)
 		}
 	} else if pilihMainMenu == "3" {
+		if n != 0 {
+			searchData(data, n, recycle, &dataSearch, &nSearch)
+		} else {
+			popUp("Belum ada data peserta Seagames yang dimasukkan. Tekan 'enter' untuk melanjutkan")
+			mainMenu(data, n, recycle)
+		}
+	} else if pilihMainMenu == "4" {
 		fmt.Print("Apakah anda ingin keluar (Y/N)? ")
 		fmt.Scan(&pilih)
 		if pilih == "Y" || pilih == "y" {
@@ -157,8 +280,16 @@ func center(s string, w int) string {
 }
 
 func cetakData(data pesertaSeagames, n int, recycle recycleID) {
-	var maxG, maxS, maxB string
-	maxGSB(data, &maxG, &maxS, &maxB, n)
+	fmt.Println("---------------------------------------------------------------------------------------")
+	fmt.Printf("|%-4v|%-5v|%-30v|%-5v|%-7v|%-7v|%-6v|%-14v|\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
+	fmt.Println("---------------------------------------------------------------------------------------")
+	for i := 0; i < n; i++ {
+		fmt.Printf("|%v|%v|%-30v|%v|%v|%v|%v|%v|\n", center(data[i].id, 4), center(strconv.Itoa(data[i].rank), 5), data[i].negara, center(strconv.Itoa(data[i].gold), 5), center(strconv.Itoa(data[i].silver), 7), center(strconv.Itoa(data[i].bronze), 7), center(strconv.Itoa(data[i].tMedali), 6), center(strconv.Itoa(data[i].rankByT), 14))
+		fmt.Println("---------------------------------------------------------------------------------------")
+	}
+}
+
+func cetakSearch(data arraySearch, n int) {
 	fmt.Println("---------------------------------------------------------------------------------------")
 	fmt.Printf("|%-4v|%-5v|%-30v|%-5v|%-7v|%-7v|%-6v|%-14v|\n", "Id", "Rank", "Team/NOC", "Gold", "Silver", "Bronze", "Total", "Rank by Total")
 	fmt.Println("---------------------------------------------------------------------------------------")
@@ -240,6 +371,11 @@ func addData(data *pesertaSeagames, n *int, recycle *recycleID) {
 						data[i].id = id.String()[:3]
 					}
 					data[i].negara = negara
+					if data[i].negara[0] >= 97 && data[i].negara[0] <= 122 {
+						x := data[i].negara[0]
+						x -= 32
+						data[i].negara = string(x) + data[i].negara[1:]
+					}
 					data[i].gold = gold
 					data[i].silver = silver
 					data[i].bronze = bronze
@@ -264,6 +400,11 @@ func addData(data *pesertaSeagames, n *int, recycle *recycleID) {
 							data[i].id = id.String()[:3]
 						}
 						data[i].negara = negara
+						if data[i].negara[0] >= 97 && data[i].negara[0] <= 122 {
+							x := data[i].negara[0]
+							x -= 32
+							data[i].negara = string(x) + data[i].negara[1:]
+						}
 						data[i].gold = gold
 						data[i].silver = silver
 						data[i].bronze = bronze
@@ -303,6 +444,11 @@ func addData(data *pesertaSeagames, n *int, recycle *recycleID) {
 					id := uuid.New()
 					data[i].id = id.String()[:3]
 					data[i].negara = negara
+					if data[i].negara[0] >= 97 && data[i].negara[0] <= 122 {
+						x := data[i].negara[0]
+						x -= 32
+						data[i].negara = string(x) + data[i].negara[1:]
+					}
 					data[i].gold = gold
 					data[i].silver = silver
 					data[i].bronze = bronze
@@ -317,6 +463,11 @@ func addData(data *pesertaSeagames, n *int, recycle *recycleID) {
 						id := uuid.New()
 						data[i].id = id.String()[:3]
 						data[i].negara = negara
+						if data[i].negara[0] >= 97 && data[i].negara[0] <= 122 {
+							x := data[i].negara[0]
+							x -= 32
+							data[i].negara = string(x) + data[i].negara[1:]
+						}
 						data[i].gold = gold
 						data[i].silver = silver
 						data[i].bronze = bronze
