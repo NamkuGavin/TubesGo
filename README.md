@@ -13,6 +13,8 @@ Aplikasi digunakan untuk pencatatan pengumpulan medali seagames. Selain itu, apl
 1.1
 - Menghilangkan sistem recycleID pada aplikasi
 
+1.2
+- Menambahkan program executable file
 ## Test Case
 ini kalau mau mencoba aplikasi nya pakai test case ini kalau bingung :D
 ```
