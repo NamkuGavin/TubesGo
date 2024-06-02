@@ -9,5 +9,6 @@ Aplikasi digunakan untuk pencatatan pengumpulan medali seagames. Selain itu, apl
 1.0
 - Perbaikan metode sorting pada sorting data peserta seagames
 - Launching
+
 1.1
 - Menghilangkan sistem recycleID pada aplikasi
